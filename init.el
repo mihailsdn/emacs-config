@@ -1,14 +1,8 @@
 ;;; init.el --- Emacs configurations -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2024 Mihails <mihails.dn@gmail.com>
-
-;; Author: Mihails <mihails.dn@gmail.com>
-;; Repository: https://github.com/mihailsdn/emacs-config
-;; Package-Requires: ((emacs "29.1"))
+;; Copyright (C) 2026 Mihails <mihails.dn@gmail.com>
 
 ;; This file is not part of GNU Emacs.
-
-;;; License:
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -27,91 +21,92 @@
 
 ;;; Code:
 
+(setq user-full-name "Mihails <mihails.dn@gmail.com>")
+
+(add-to-list 'default-frame-alist '(height . 33))
+(add-to-list 'default-frame-alist '(width . 110))
+;;(add-to-list 'default-frame-alist '(alpha-background . 98))
+
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
+(set-face-attribute 'default nil :family "IBM Plex Mono" :height 140 :weight 'regular)
+(set-face-attribute 'fixed-pitch nil :family "IBM Plex Mono" :height 140 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :family "IBM Plex Mono" :height 140 :weight 'regular)
+
 ;; Minimal UI
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-(menu-bar-mode -1)
+(tool-bar-mode 0)
+(menu-bar-mode 0)
+(set-scroll-bar-mode nil)
 
 (setq frame-title-format "%f"
-      inhibit-splash-screen t
-      make-backup-files nil
-      warning-minimum-level :error)
+      inhibit-splash-screen t ;; disable startup screen
+      scroll-conservatively 101
+      scroll-margin 0
+      use-short-answers t ;; enable y/n
+      make-backup-files nil)
 
-(setq read-process-output-max (* 1024 1024)) ;; 1mb
+(setq gc-cons-threshold 50000000 ;; 50mb
+      read-process-output-max (* 1024 1024)) ;; 1mb
 
-;; Window
-(add-to-list 'default-frame-alist '(height . 36))
-(add-to-list 'default-frame-alist '(width . 120))
-(add-to-list 'default-frame-alist '(alpha-background . 98))
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
 
-(set-face-attribute 'default nil :family "DejaVu Sans Mono" :height 130 :weight 'book)
-(set-face-attribute 'variable-pitch nil :family "DejaVu Serif" :height 130 :weight 'book)
-(set-face-attribute 'fixed-pitch nil :family "DejaVu Sans Mono" :height 130 :weight 'book)
-
-(setq display-line-numbers-type 'relative)
-(global-display-line-numbers-mode)
-(set-default-coding-systems 'utf-8)
-
+(global-display-line-numbers-mode t)
 (column-number-mode t)
 (electric-pair-mode t)
 (show-paren-mode t)
 (cua-mode t) ;; Copy and Paste - Ctrl+C, Ctrl+V
 
-(setq-default tab-width 4
-              indent-tabs-mode nil)
-
 ;; Automatically remove trailing whitespace when file is saved
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
-;; Scrolling
-(setq scroll-margin 3
-      pixel-scroll-mode t
-      pixel-scroll-precision-mode t)
+(keymap-global-set "<f2>" 'bs-show)
+(keymap-global-set "<f3>" 'kill-buffer)
+(keymap-global-set "<f5>" 'save-buffer)
 
-;; Yes and No
-(defalias 'yes-or-no-p 'y-or-n-p)
+(keymap-global-set "<f6>" 'shell-command)
+(keymap-global-set "<f7>" 'undo)
+(keymap-global-set "<f8>" 'flyspell-prog-mode)
 
-;; Built-in buffer
-(require 'bs)
-(setq bs-configurations
-      '(("files" "^\\*scratch\\*" nil nil bs-visits-non-file bs-sort-buffer-interns-are-last)))
+(keymap-global-set "C-b" 'bookmark-set)
+(keymap-global-set "M-b" 'bookmark-jump)
+(keymap-global-set "<f4>" 'bookmark-bmenu-list)
 
-(global-set-key (kbd "<f2>") 'bs-show)
-(global-set-key (kbd "<f3>") 'kill-buffer)
-(global-set-key (kbd "<f5>") 'save-buffer)
+(setq major-mode-remap-alist
+      '((c-mode . c-ts-mode)
+        (c++-mode . c++-ts-mode)
+        (json-mode . json-ts-mode)))
 
-(global-set-key (kbd "<f6>") 'shell-command)
-(global-set-key (kbd "<f7>") 'undo)
-(global-set-key (kbd "<f8>") 'flyspell-prog-mode)
+(add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
+(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-ts-mode))
 
-(global-set-key (kbd "C-b") 'bookmark-set)
-(global-set-key (kbd "M-b") 'bookmark-jump)
-(global-set-key (kbd "<f4>") 'bookmark-bmenu-list)
-
-;; Org-mode
-(setq org-log-done t ;; Time
-      org-src-fontify-natively t)
+;; M-x treesit-install-language-grammar
+(setq treesit-language-source-alist
+      '((c "https://github.com/tree-sitter/tree-sitter-c")
+        (go "https://github.com/tree-sitter/tree-sitter-go")
+        (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+        (json "https://github.com/tree-sitter/tree-sitter-json")
+        (cmake "https://github.com/uyha/tree-sitter-cmake")))
 
 ;; Melpa
 (require 'package)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
 ;; Settings for use-package
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-;; A low contrast color theme for Emacs
-(use-package zenburn-theme
-  :pin melpa
+;; Color themes
+(use-package tokyo-night
+  :vc (:url "https://github.com/bbatsov/tokyo-night-emacs" :rev :newest)
   :config
-  (setq zenburn-scale-org-headlines t
-        zenburn-use-variable-pitch t
-        zenburn-scale-outline-headlines t)
-  (load-theme 'zenburn t)
-  (set-cursor-color "#D0BF8F"))
+  (setq tokyo-night-scale-headings nil)
+  (load-theme 'tokyo-night t))
 
 ;; A Library for Nerd Font icons
 ;; M-x nerd-icons-install-fonts
@@ -143,17 +138,8 @@
   (setq vertico-count 12
         vertico-resize t))
 
-;; On-the-fly syntax checking
-(use-package flycheck
-  :pin melpa-stable
-  :init (global-flycheck-mode))
-
 ;; A Git porcelain inside Emacs
 (use-package magit
-  :pin melpa)
-
-;; Major mode for editing JSON files
-(use-package json-mode
   :pin melpa)
 
 ;; Major mode for Markdown-formatted text
@@ -162,50 +148,18 @@
   :mode ("README\\.md\\'" . gfm-mode)
   :init (setq markdown-command "multimarkdown"))
 
-;; Major mode for editing YAML files
-(use-package yaml-mode
-  :pin melpa
-  :mode ("\\.yml\\'" . yaml-mode))
+;; Eglot
+(use-package eglot
+  :pin gnu
+  :hook ((c-ts-mode . eglot-ensure)
+         (go-ts-mode . eglot-ensure)
+         (c++-ts-mode . eglot-ensure))
+  :config (add-to-list 'eglot-server-programs '((c-ts-mode c++-ts-mode) "clangd")))
 
-;; Improved JavaScript editing mode
-(use-package js2-mode
-  :pin melpa
-  :mode
-  ("node" . js2-mode)
-  ("\\.js\\'" . js2-mode))
-
-;; Major mode for the Go programming language
-(use-package go-mode
-  :pin melpa
-  :mode ("\\.go\\'" . go-mode))
-
-;; Major mode for editing web templates
-(use-package web-mode
-  :pin melpa
-  :mode
-  ("\\.html\\'" . web-mode)
-  ("\\.phtml\\'" . web-mode)
-  ("\\.tpl\\.php\\'" . web-mode)
-  :init
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-enable-auto-pairing t
-        web-mode-enable-current-element-highlight t))
-
-;; LSP
-(use-package lsp-mode
-  :pin melpa-stable
-  :config (setq lsp-modeline-code-action-fallback-icon "?!")
-  :commands (lsp lsp-deferred)
-  :hook (go-mode . lsp-deferred))
-
-;; Set up before-save hooks to format buffer and add/delete imports
-;; Make sure you don't have other gofmt/goimports hooks enabled
-(defun lsp-go-install-save-hooks ()
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
-(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+;; GO fmt
+(defun eglot-format-buffer-before-save ()
+  (add-hook 'before-save-hook #'eglot-format-buffer -10 t))
+(add-hook 'go-ts-mode-hook #'eglot-format-buffer-before-save)
 
 ;; Modular text completion framework
 (use-package company
@@ -215,6 +169,42 @@
   (setq company-idle-delay 0
         company-minimum-prefix-length 1
         company-format-margin-function #'company-text-icons-margin))
+
+(defun my-insert-spdx-license ()
+  "SPDX-License."
+  (interactive)
+  (let ((year (format-time-string "%Y"))
+        (user user-full-name))
+    (save-excursion
+      (goto-char (point-min))
+      (insert "// SPDX-License-Identifier: MIT\n")
+      (insert (format "// SPDX-FileCopyrightText: %s %s\n\n" year user)))))
+
+(defun my-insert-cpp-guards ()
+  "C++ include guards."
+  (interactive)
+  (let* ((file-name (file-name-nondirectory (file-name-sans-extension (buffer-file-name))))
+         (guard (concat (upcase file-name) "_H")))
+    (save-excursion
+      (goto-char (point-min))
+      (while (looking-at "^//") (forward-line 1))
+      (insert (format "#ifndef %s\n#define %s\n\n" guard guard))
+      (goto-char (point-max))
+      (insert (format "\n#endif // %s\n" guard)))))
+
+(defun my-insert-pragma-once ()
+  "pragma once"
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (looking-at "^//") (forward-line 1))
+    (insert "#pragma once\n\n")))
+
+(defun my-cpp-header-init ()
+  "SPDX-License + Guard."
+  (interactive)
+  (my-insert-spdx-license)
+  (my-insert-cpp-guards))
 
 (provide 'init)
 
