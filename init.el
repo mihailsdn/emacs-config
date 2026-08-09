@@ -161,14 +161,23 @@
   (add-hook 'before-save-hook #'eglot-format-buffer -10 t))
 (add-hook 'go-ts-mode-hook #'eglot-format-buffer-before-save)
 
-;; Modular text completion framework
-(use-package company
-  :pin melpa
-  :hook (after-init . global-company-mode)
-  :config
-  (setq company-idle-delay 0
-        company-minimum-prefix-length 1
-        company-format-margin-function #'company-text-icons-margin))
+;; Completion in Region FUnction
+(use-package corfu
+  :pin gnu
+  :init
+  (global-corfu-mode)
+  :custom
+  (corfu-auto t)
+  (corfu-auto-delay 0.1)
+  (corfu-auto-prefix 1)
+  (corfu-quit-no-match 'separator))
+
+;; Completion At Point Extensions
+(use-package cape
+  :pin gnu
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev))
 
 (defun my-insert-spdx-license ()
   "SPDX-License."
