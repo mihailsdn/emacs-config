@@ -156,7 +156,7 @@
          (c++-ts-mode . eglot-ensure))
   :config (add-to-list 'eglot-server-programs '((c-ts-mode c++-ts-mode) "clangd")))
 
-;; GO fmt
+;; fmt
 (defun eglot-format-buffer-before-save ()
   (add-hook 'before-save-hook #'eglot-format-buffer -10 t))
 (add-hook 'go-ts-mode-hook #'eglot-format-buffer-before-save)
