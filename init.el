@@ -160,6 +160,7 @@
 (defun eglot-format-buffer-before-save ()
   (add-hook 'before-save-hook #'eglot-format-buffer -10 t))
 (add-hook 'go-ts-mode-hook #'eglot-format-buffer-before-save)
+(add-hook 'c++-ts-mode-hook #'eglot-format-buffer-before-save)
 
 ;; Completion in Region FUnction
 (use-package corfu
